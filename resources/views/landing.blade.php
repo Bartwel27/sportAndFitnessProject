@@ -64,7 +64,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
       <a class="hide" href="#shop">Shop</a>
       <a class="hide" href="#featured">Featured</a>
       @auth<a class="hide" href="/dashboard">My account</a>@else<a class="hide" href="/login">Login</a>@endauth
-      <a class="cart" href="/cart">Cart ({{ count(session('cart', [])) }})</a>
+      <a class="cart" href="/cart">Cart ({{ collect(session('cart', []))->sum('quantity') }})</a>
     </nav>
   </div>
 </header>
@@ -85,11 +85,12 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 <section id="shop">
   <div class="wrap">
     <h2>Shop by sport</h2>
-    <div class="cats">
-      <a class="cat" href="/products?category=football"><h3>Football</h3><span>Boots, balls, kits</span></a>
-      <a class="cat" href="/products?category=gym"><h3>Gym</h3><span>Weights, mats, benches</span></a>
-      <a class="cat" href="/products?category=running"><h3>Running</h3><span>Shoes and apparel</span></a>
-      <a class="cat" href="/products?category=nutrition"><h3>Nutrition</h3><span>Protein and supplements</span></a>
+    <div class="cats" data-live-block="categories">
+      @forelse($categories as $c)
+        <a class="cat" href="/products?category={{ $c->slug }}"><h3>{{ $c->name }}</h3><span>{{ $c->products_count }} {{ \Illuminate\Support\Str::plural('product', $c->products_count) }}</span></a>
+      @empty
+        <p>No categories yet.</p>
+      @endforelse
     </div>
   </div>
 </section>
@@ -97,10 +98,23 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 <section id="featured" style="padding-top:0">
   <div class="wrap">
     <h2>Featured products</h2>
-    <div class="grid">
-      @foreach($products as $p)
-      <article class="card">@if($p->image)<img src="{{ asset('storage/'.$p->image) }}" alt="{{ $p->name }}" style="height:170px;width:100%;object-fit:cover">@else<div class="thumb" style="background:var(--green)">{{ strtoupper(substr($p->name,0,2)) }}</div>@endif<div class="body"><h3>{{ $p->name }}</h3><small>{{ $p->category->name }}</small><div class="price">K{{ number_format($p->price,2) }}</div><form method="POST" action="/cart/add/{{ $p->id }}">@csrf<button class="btn">Add to cart</button></form></div></article>
-      @endforeach
+    <div class="grid" data-live-block="featured">
+      @forelse($latest->take(4) as $p)
+      <article class="card">
+        <a href="/products/{{ $p->id }}">
+        @if($p->image)<img src="{{ asset('storage/'.$p->image) }}" alt="{{ $p->name }}" style="height:170px;width:100%;object-fit:cover;display:block">
+        @else<div class="thumb" style="background:{{ ['#0e7a4f','#d6342c','#2c5fb3','#8a5a14'][$p->category_id % 4] }}">{{ strtoupper(substr($p->name, 0, 2)) }}</div>@endif
+        </a>
+        <div class="body">
+          <h3><a href="/products/{{ $p->id }}">{{ $p->name }}</a></h3>
+          <small>{{ $p->category->name }}@if($p->stock < 1) &middot; Out of stock @elseif($p->stock <= 5) &middot; Only {{ $p->stock }} left @endif</small>
+          <div class="price">K{{ number_format($p->price, 2) }}</div>
+          <form method="POST" action="/cart/add/{{ $p->id }}">@csrf<button class="btn" @disabled($p->stock < 1)>Add to cart</button></form>
+        </div>
+      </article>
+      @empty
+      <p>No products yet. Check back soon.</p>
+      @endforelse
     </div>
   </div>
 </section>
@@ -131,5 +145,6 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
   </div>
 </footer>
 
+<script src="{{ asset('js/live.js') }}"></script>
 </body>
 </html>

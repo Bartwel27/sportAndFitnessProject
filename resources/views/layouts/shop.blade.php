@@ -10,5 +10,6 @@
 <form method="POST" action="/logout">@csrf<button class="btn btn-link nav-link">Logout</button></form>
 @else<a class="nav-link" href="/login">Login</a>@endauth
 <a class="btn btn-warning ms-2" href="/cart">Cart</a></div></div></nav>
-<main class="container py-4">@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif @yield('content')</main>
+<main class="container py-4">@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif <div data-live-block="page">@yield('content')</div></main>
+<script src="{{ asset('js/live.js') }}"></script>
 </body></html>

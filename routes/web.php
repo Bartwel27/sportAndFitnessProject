@@ -2,8 +2,10 @@
 use App\Http\Controllers\{AdminController, CartController, HomeController, ProductController, ProfileController, UserDashboardController};
 use Illuminate\Support\Facades\Route;
 
+
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/products', [ProductController::class, 'index']);
+Route::get('/live/version', [ProductController::class, 'version']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
 
 Route::get('/cart', [CartController::class, 'index']);

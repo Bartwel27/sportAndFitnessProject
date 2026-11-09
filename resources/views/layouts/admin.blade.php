@@ -14,5 +14,7 @@
 <form method="POST" action="/logout" class="mt-4">@csrf
 <button class="btn btn-outline-light btn-sm">Logout</button></form>
 </aside>
-<main class="flex-grow-1 p-4 bg-light">@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif @yield('content')</main>
-</div></body></html>
+<main class="flex-grow-1 p-4 bg-light">@if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif <div data-live-block="page">@yield('content')</div></main>
+</div>
+<script src="{{ asset('js/live.js') }}"></script>
+</body></html>
